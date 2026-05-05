@@ -1,2 +1,4 @@
 output/
+mikrotik-secret-*.json
+mikrotik-import-*.txt
 node_modules/

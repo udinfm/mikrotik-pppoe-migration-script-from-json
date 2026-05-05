@@ -14,6 +14,15 @@ Format JSON mengikuti contoh export yang berisi:
 - `profile`
 - `service`
 
+## Warning
+
+File hasil export menyimpan password PPPoE dalam bentuk plaintext.
+
+- Jangan commit file hasil export ke repository.
+- Jangan kirim file export ke channel publik atau pihak yang tidak berwenang.
+- Simpan file hasil export hanya di folder kerja yang aman.
+- Hapus file export setelah proses migrasi selesai jika sudah tidak dibutuhkan.
+
 ## Kebutuhan
 
 - Node.js 18 atau lebih baru
@@ -59,6 +68,8 @@ Default folder output pada prompt saat ini adalah:
 ```text
 .\output\with-service
 ```
+
+Folder `output/` sudah masuk `.gitignore`, jadi hasil export default tidak ikut ter-track oleh git.
 
 Format JSON hasil export berupa array object seperti ini:
 
