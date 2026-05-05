@@ -4,6 +4,7 @@ import {
   promptRepeatAction,
   promptSaveConfirmation,
 } from "./src/cli/prompts.js";
+import { getAppIntroLines } from "./src/config/app.js";
 import { fetchSecrets } from "./src/mikrotik/fetch.js";
 import { buildImportScript, writeExportFiles } from "./src/export/files.js";
 
@@ -63,7 +64,11 @@ async function runExportFlow() {
  */
 async function main() {
   try {
-    console.log(chalk.cyan.bold("\n=== MikroTik PPPoE Secret Export Tool ===\n"));
+    const [appTitle, appDescription, appContactMessage] = getAppIntroLines();
+    console.log(chalk.cyan.bold(`\n=== ${appTitle} ===`));
+    console.log(chalk.gray(appDescription));
+    console.log(chalk.gray(appContactMessage));
+    console.log("");
 
     let shouldRepeat = true;
     while (shouldRepeat) {

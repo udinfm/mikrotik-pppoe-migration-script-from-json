@@ -1,6 +1,7 @@
 {
   "name": "mikrotik-pppoe-migration-script-from-json",
   "version": "1.0.0",
+  "description": "CLI interaktif untuk export PPP secret MikroTik ke JSON dan script import",
   "private": true,
   "type": "module",
   "scripts": {
