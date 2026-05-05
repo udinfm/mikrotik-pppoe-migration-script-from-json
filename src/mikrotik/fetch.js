@@ -1,6 +1,12 @@
 import http from "node:http";
 import https from "node:https";
 
+/**
+ * Menormalkan host yang diinput user menjadi base URL yang siap dipakai.
+ * Jika user hanya mengisi IP/domain, default protokolnya dianggap HTTPS.
+ * @param {string} host
+ * @returns {URL}
+ */
 function normalizeBaseUrl(host) {
   const trimmedHost = String(host || "").trim();
   if (!trimmedHost) {
@@ -16,11 +22,31 @@ function normalizeBaseUrl(host) {
   return url;
 }
 
+/**
+ * MikroTik kadang mengirim boolean dalam bentuk string.
+ * Fungsi ini menyeragamkan nilainya menjadi "true" atau "false".
+ * @param {unknown} value
+ * @returns {"true" | "false"}
+ */
 function normalizeDisabled(value) {
   const normalized = String(value).trim().toLowerCase();
   return normalized === "true" || normalized === "yes" ? "true" : "false";
 }
 
+/**
+ * Menyisakan hanya field yang memang kita butuhkan untuk export dan import.
+ * Ini membuat hasil JSON lebih konsisten walaupun response router punya banyak properti tambahan.
+ * @param {Record<string, unknown>} secret
+ * @param {string} fallbackService
+ * @returns {{
+ *   ".id": string,
+ *   disabled: "true" | "false",
+ *   name: string,
+ *   password: string,
+ *   profile: string,
+ *   service: string
+ * }}
+ */
 function normalizeSecret(secret, fallbackService) {
   return {
     ".id": String(secret[".id"] ?? ""),
@@ -32,6 +58,18 @@ function normalizeSecret(secret, fallbackService) {
   };
 }
 
+/**
+ * Request GET sederhana untuk endpoint REST MikroTik yang mengembalikan JSON.
+ * Basic auth dipakai karena ini format auth bawaan yang umum pada RouterOS REST.
+ * @param {URL} url
+ * @param {{
+ *   username: string,
+ *   password: string,
+ *   timeoutMs: number,
+ *   insecure: boolean
+ * }} options
+ * @returns {Promise<unknown>}
+ */
 function httpRequestJson(url, { username, password, timeoutMs, insecure }) {
   const transport = url.protocol === "https:" ? https : http;
   const headers = {
@@ -71,6 +109,7 @@ function httpRequestJson(url, { username, password, timeoutMs, insecure }) {
           }
 
           try {
+            // Endpoint REST yang kita pakai selalu diharapkan mengirim JSON.
             resolve(JSON.parse(rawBody));
           } catch (error) {
             reject(new Error(`Response bukan JSON valid: ${error.message}`));
@@ -91,6 +130,26 @@ function httpRequestJson(url, { username, password, timeoutMs, insecure }) {
   });
 }
 
+/**
+ * Mengambil daftar secret dari router lalu memfilter hanya service yang diminta.
+ * Hasil akhir sudah dinormalisasi agar siap ditulis ke JSON atau diubah jadi script import.
+ * @param {{
+ *   host: string,
+ *   username: string,
+ *   password: string,
+ *   service: string,
+ *   timeoutMs: number,
+ *   insecure: boolean
+ * }} params
+ * @returns {Promise<Array<{
+ *   ".id": string,
+ *   disabled: "true" | "false",
+ *   name: string,
+ *   password: string,
+ *   profile: string,
+ *   service: string
+ * }>>}
+ */
 export async function fetchSecrets({
   host,
   username,
@@ -115,6 +174,8 @@ export async function fetchSecrets({
   }
 
   return responseJson
+    // Filter tetap dipertahankan di sisi aplikasi agar aman jika router
+    // mengembalikan data lebih luas dari query yang diminta.
     .filter((item) => String(item.service ?? service) === service)
     .map((item) => normalizeSecret(item, service));
 }

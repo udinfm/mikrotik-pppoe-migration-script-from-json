@@ -3,6 +3,14 @@ import { promptExportConfig, promptSaveConfirmation } from "./src/cli/prompts.js
 import { fetchSecrets } from "./src/mikrotik/fetch.js";
 import { buildImportScript, writeExportFiles } from "./src/export/files.js";
 
+/**
+ * Menjalankan alur CLI utama:
+ * 1. minta parameter koneksi,
+ * 2. ambil data dari MikroTik,
+ * 3. tampilkan preview,
+ * 4. simpan file jika user setuju.
+ * @returns {Promise<void>}
+ */
 async function main() {
   try {
     console.log(chalk.cyan.bold("\n=== MikroTik PPPoE Secret Export Tool ===\n"));
@@ -22,6 +30,8 @@ async function main() {
     console.log(chalk.gray(`Folder output: ${exportConfig.outputDir}`));
     console.log(chalk.gray(`Nama file akan memakai timestamp tanggal dan waktu.`));
 
+    // Preview dibatasi beberapa baris supaya user bisa sanity-check
+    // hasil export tanpa memenuhi terminal.
     const preview = buildImportScript(secrets)
       .split("\n")
       .slice(0, 6)

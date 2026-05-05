@@ -1,7 +1,21 @@
 import inquirer from "inquirer";
 
+// Folder default dibuat relatif ke repo agar aman dipakai di mesin mana pun.
 const DEFAULT_OUTPUT_DIR = ".\\output\\with-service";
 
+/**
+ * Mengumpulkan semua input yang dibutuhkan sebelum request ke MikroTik dijalankan.
+ * Validasi dilakukan di level prompt agar error dasar tertangkap lebih awal.
+ * @returns {Promise<{
+ *   host: string,
+ *   username: string,
+ *   password: string,
+ *   service: string,
+ *   insecure: boolean,
+ *   outputDir: string,
+ *   timeoutMs: number
+ * }>}
+ */
 export async function promptExportConfig() {
   const answers = await inquirer.prompt([
     {
@@ -99,6 +113,10 @@ export async function promptExportConfig() {
   };
 }
 
+/**
+ * Meminta konfirmasi akhir sebelum file benar-benar ditulis ke disk.
+ * @returns {Promise<boolean>}
+ */
 export async function promptSaveConfirmation() {
   const { shouldSave } = await inquirer.prompt([
     {
