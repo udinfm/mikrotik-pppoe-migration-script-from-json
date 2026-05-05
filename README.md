@@ -53,6 +53,7 @@ Setelah data berhasil diambil, script akan:
 - menampilkan jumlah secret yang ditemukan
 - menampilkan preview script import
 - meminta konfirmasi sebelum menyimpan file
+- memberi pilihan untuk ulang export lagi atau selesai setelah satu proses berakhir
 
 ## Output
 

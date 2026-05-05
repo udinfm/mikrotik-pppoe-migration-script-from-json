@@ -129,3 +129,30 @@ export async function promptSaveConfirmation() {
 
   return shouldSave;
 }
+
+/**
+ * Setelah satu siklus selesai, user bisa memilih ulang export atau keluar dari CLI.
+ * @returns {Promise<boolean>}
+ */
+export async function promptRepeatAction() {
+  const { nextAction } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "nextAction",
+      message: "Apa yang ingin dilakukan selanjutnya?",
+      choices: [
+        {
+          name: "Ulang export lagi",
+          value: "repeat",
+        },
+        {
+          name: "Selesai / keluar",
+          value: "exit",
+        },
+      ],
+      default: "exit",
+    },
+  ]);
+
+  return nextAction === "repeat";
+}
